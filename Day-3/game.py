@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # Initialize pygame
 pygame.init()
@@ -22,6 +23,11 @@ right_paddle = pygame.Rect(WIDTH - 30, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_
 
 # Ball
 ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
+
+# Scores
+left_score = 0
+right_score = 0
+font = pygame.font.Font(None, 50)  # Font for score display
 
 # Game loop
 running = True
@@ -55,11 +61,34 @@ while running:
     if ball.top <= 0 or ball.bottom >= HEIGHT:
         BALL_SPEED_Y = -BALL_SPEED_Y  # Reverse Y direction
 
+    # Ball collision with paddles
+    if ball.colliderect(left_paddle) or ball.colliderect(right_paddle):
+        BALL_SPEED_X = -BALL_SPEED_X  # Reverse X direction
+
+    # Scoring system (if ball goes off screen)
+    if ball.left <= 0:  # Right player scores
+        right_score += 1
+        ball.x, ball.y = WIDTH // 2, HEIGHT // 2  # Reset ball
+        BALL_SPEED_X = random.choice([-5, 5])  # Random restart direction
+        BALL_SPEED_Y = random.choice([-5, 5])
+
+    if ball.right >= WIDTH:  # Left player scores
+        left_score += 1
+        ball.x, ball.y = WIDTH // 2, HEIGHT // 2  # Reset ball
+        BALL_SPEED_X = random.choice([-5, 5])
+        BALL_SPEED_Y = random.choice([-5, 5])
+
     # Drawing
     screen.fill(BLACK)
     pygame.draw.rect(screen, WHITE, left_paddle)
     pygame.draw.rect(screen, WHITE, right_paddle)
     pygame.draw.ellipse(screen, WHITE, ball)
+
+    # Draw scores
+    left_text = font.render(str(left_score), True, WHITE)
+    right_text = font.render(str(right_score), True, WHITE)
+    screen.blit(left_text, (WIDTH // 4, 20))
+    screen.blit(right_text, (WIDTH * 3 // 4, 20))
 
     pygame.display.flip()  # Update display
 
