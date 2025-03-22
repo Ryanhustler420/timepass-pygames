@@ -13,6 +13,12 @@ BLACK = (0, 0, 0)
 PADDLE_SPEED = 5
 BALL_SPEED_X = 5
 BALL_SPEED_Y = 5
+BALL_ACCELERATION = 1.05  # Ball speeds up after each paddle hit
+
+# Load sound effects
+# paddle_sound = pygame.mixer.Sound("paddle_hit.wav")
+# wall_sound = pygame.mixer.Sound("wall_hit.wav")
+# score_sound = pygame.mixer.Sound("score.wav")
 
 # Set up display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -61,19 +67,20 @@ while running:
     # Ball collision with top and bottom walls
     if ball.top <= 0 or ball.bottom >= HEIGHT:
         BALL_SPEED_Y = -BALL_SPEED_Y  # Reverse Y direction
+        # wall_sound.play()
 
     # Ball collision with paddles (Improved)
     if ball.colliderect(left_paddle):
-        BALL_SPEED_X = abs(BALL_SPEED_X)  # Ensure it moves right
-        # Calculate bounce angle
+        BALL_SPEED_X = abs(BALL_SPEED_X) * BALL_ACCELERATION  # Ensure it moves right and speeds up
         hit_pos = (ball.centery - left_paddle.centery) / (PADDLE_HEIGHT / 2)
         BALL_SPEED_Y = hit_pos * 5  # Adjust angle
+        # paddle_sound.play()
 
     if ball.colliderect(right_paddle):
-        BALL_SPEED_X = -abs(BALL_SPEED_X)  # Ensure it moves left
-        # Calculate bounce angle
+        BALL_SPEED_X = -abs(BALL_SPEED_X) * BALL_ACCELERATION  # Ensure it moves left and speeds up
         hit_pos = (ball.centery - right_paddle.centery) / (PADDLE_HEIGHT / 2)
         BALL_SPEED_Y = hit_pos * 5  # Adjust angle
+        # paddle_sound.play()
 
     # Scoring system (if ball goes off screen)
     if ball.left <= 0:  # Right player scores
@@ -81,12 +88,14 @@ while running:
         ball.x, ball.y = WIDTH // 2, HEIGHT // 2  # Reset ball
         BALL_SPEED_X = random.choice([-5, 5])
         BALL_SPEED_Y = random.choice([-5, 5])
+        # score_sound.play()
 
     if ball.right >= WIDTH:  # Left player scores
         left_score += 1
         ball.x, ball.y = WIDTH // 2, HEIGHT // 2  # Reset ball
         BALL_SPEED_X = random.choice([-5, 5])
         BALL_SPEED_Y = random.choice([-5, 5])
+        # score_sound.play()
 
     # Drawing
     screen.fill(BLACK)
