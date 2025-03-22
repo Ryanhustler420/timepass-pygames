@@ -11,7 +11,8 @@ BALL_SIZE = 10
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 PADDLE_SPEED = 5
-BALL_SPEED_X, BALL_SPEED_Y = 5, 5  # Ball movement speed
+BALL_SPEED_X = 5
+BALL_SPEED_Y = 5
 
 # Set up display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -61,15 +62,24 @@ while running:
     if ball.top <= 0 or ball.bottom >= HEIGHT:
         BALL_SPEED_Y = -BALL_SPEED_Y  # Reverse Y direction
 
-    # Ball collision with paddles
-    if ball.colliderect(left_paddle) or ball.colliderect(right_paddle):
-        BALL_SPEED_X = -BALL_SPEED_X  # Reverse X direction
+    # Ball collision with paddles (Improved)
+    if ball.colliderect(left_paddle):
+        BALL_SPEED_X = abs(BALL_SPEED_X)  # Ensure it moves right
+        # Calculate bounce angle
+        hit_pos = (ball.centery - left_paddle.centery) / (PADDLE_HEIGHT / 2)
+        BALL_SPEED_Y = hit_pos * 5  # Adjust angle
+
+    if ball.colliderect(right_paddle):
+        BALL_SPEED_X = -abs(BALL_SPEED_X)  # Ensure it moves left
+        # Calculate bounce angle
+        hit_pos = (ball.centery - right_paddle.centery) / (PADDLE_HEIGHT / 2)
+        BALL_SPEED_Y = hit_pos * 5  # Adjust angle
 
     # Scoring system (if ball goes off screen)
     if ball.left <= 0:  # Right player scores
         right_score += 1
         ball.x, ball.y = WIDTH // 2, HEIGHT // 2  # Reset ball
-        BALL_SPEED_X = random.choice([-5, 5])  # Random restart direction
+        BALL_SPEED_X = random.choice([-5, 5])
         BALL_SPEED_Y = random.choice([-5, 5])
 
     if ball.right >= WIDTH:  # Left player scores
